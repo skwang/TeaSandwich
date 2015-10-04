@@ -42,32 +42,38 @@ public class Vehicle {
 	// Update the Vehicle over an interval dt (in ms), in response to
 	// the signal s
 	public double updateFromSignal(double dt, Signal s) {
-		double secs = dt/1000;
+		double secs = dt;
 		double new_speed = speed + secs * acceleration;
 		double avg_speed = (speed + new_speed)/2; // TODO: Try without the avg_speed
-		if (avg_speed < 0)
+		if (avg_speed <= 0) {
 			avg_speed = 0;
+			this.speed = 0;
+			this.acceleration = 0;
+		}
 		else if (avg_speed > TOP_SPEED)
 			avg_speed = TOP_SPEED;
 		else if (avg_speed > max_speed)
 			avg_speed = max_speed;
 		x = x + dt * avg_speed;
 		speed = avg_speed;
-		System.out.println(x);
+		System.out.println(avg_speed);
 		return x;
 	}
 	
 	// Brake the car over an interval dt. Returns True if vehicle has 
 	// not yet reached TOP_BRAKE, False otherwise
 	public boolean brake(double dt) {
-		double secs = dt/1000;
-		double brake_amount = BRAKE_RATE * secs;
-		double new_accel = acceleration + dt*brake_amount;
+		//System.out.println(dt);
+		// dt in secs!!!
+		double secs = dt;
+		double brake_amount = BRAKE_RATE; // m/s^2
+		double new_accel = acceleration - brake_amount;
 		if (new_accel > TOP_BRAKE) {
 			this.acceleration = TOP_BRAKE;
 			return false;
 		}
 		this.acceleration = new_accel;
+		//System.out.println(this.acceleration);
 		return true;
 	}
 	

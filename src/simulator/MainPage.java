@@ -45,7 +45,7 @@ public class MainPage extends BasicGameState {
 		Input input = gc.getInput();
 		avgdelta = (avgdelta * n + delta)/(n+1);
 		n++;
-		this.world.update(delta/1000.);
+		this.world.update(delta/1000.); // dt = delta/1000. is secs
 		if (n > 16) {
 			
 			n = 0;
@@ -83,7 +83,7 @@ public class MainPage extends BasicGameState {
 		Road center_road = new Road(20, world_length);
 		center_road.addVehicle(car, 'A');
 		ViewRoad v_center_road = new ViewRoad(center_road, 0, this.world.getHeight()/2, 
-									this.world.convertMetersToPixels(1));
+												this.world.convertMetersToPixels(1));
 		this.world.addViewRoad(v_center_road);
 		oneAB = new Button(v_center_road.getX(), v_center_road.getY() 
 							+ v_center_road.getWidth(), 12f, 15f, "+");

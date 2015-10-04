@@ -71,20 +71,30 @@ public class Road {
 		ArrayList<Vehicle> toBeRemoved = new ArrayList<Vehicle>();
 		if (startNode == 'A') {
 			Signal s = this.signalA;
+			Vehicle prev = null;
 			for (Vehicle v : vehiclesAB) {
 				double pos = v.updateFromSignal(dt, s);
-				if (pos > this.LENGTH)
-				{
+				if (pos > this.LENGTH) {
 					if (this.pointB == null)
 						toBeRemoved.add(v);
 				}
+				else if (prev != null && v.getFrontX() >= prev.getEndX()) {
+					v.setX(prev.getEndX());
+					v.setCrashed(true);
+					prev.setCrashed(true);
+					v.brake(dt);
+					prev.brake(dt);
+				}
+				prev = v;
 			}
 			for (Vehicle v : toBeRemoved) {
 				vehiclesAB.remove(v);
 			}
 		}
 		else if (startNode == 'B') {
+			// TODO: fix this method
 			Signal s = this.signalB;
+			Vehicle prev = null;
 			for (Vehicle v : vehiclesBA) {
 				double pos = v.updateFromSignal(dt, s);
 			}

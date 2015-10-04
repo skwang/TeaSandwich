@@ -47,6 +47,10 @@ public class ViewRoad {
 		//		float v_width = road_width / 2;
 		float v_width = pixelsToMeters * (float) v.getWidth();
 		g.setColor(Color.green);
+		
+		if (v.getCrashed()) g.setColor(Color.red); 
+		else if (v.getCurrSpeed() == 0) g.setColor(Color.orange);
+		
 		if (direction == 0) {
 			float vehicle_x = this.x + pixelsToMeters* (float) v.getEndX();
 			//			float vehicle_y = this.y + 0.6f * road_width;
