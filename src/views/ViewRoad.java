@@ -43,25 +43,34 @@ public class ViewRoad {
 	
 	// direction 0 = AB, direction 1 = BA
 	private void drawVehicle(Graphics g, Vehicle v, int direction) {
+		// vehicle length and width in pixels
 		float v_length = pixelsToMeters * (float) v.getLength();
-		//		float v_width = road_width / 2;
 		float v_width = pixelsToMeters * (float) v.getWidth();
-		g.setColor(Color.green);
+		
+		// default color is green
+		g.setColor(Color.white);
 		
 		if (v.getCrashed()) g.setColor(Color.red); 
 		else if (v.getCurrSpeed() == 0) g.setColor(Color.orange);
+		else if (v.getCurrAccel() < 0) g.setColor(Color.yellow);
+		else if (v.getCurrAccel() > 0) g.setColor(Color.green);
 		
 		if (direction == 0) {
 			float vehicle_x = this.x + pixelsToMeters* (float) v.getEndX();
-			//			float vehicle_y = this.y + 0.6f * road_width;
-			float vehicle_y = this.y + 0.75f * width - 0.5f * pixelsToMeters * (float) v_width;
+			float vehicle_y = this.y + 0.85f * width - 0.5f * pixelsToMeters * (float) v_width;
 			g.fillRect(vehicle_x, vehicle_y, v_length, v_width);
+			// print speed
+			double mpstomph = 2.23694;
+			g.setColor(Color.black);
+			g.drawString(String.format("%.1f",v.getCurrSpeed() * mpstomph), vehicle_x - 10, vehicle_y + 10);
 		}
 		else { // direction  = 1
 			float vehicle_x = this.x + pixelsToMeters * (float) v.getFrontX();
 			float vehicle_y = this.y + 0.25f * width - 0.5f * pixelsToMeters * (float) v_width;
 			g.fillRect(vehicle_x, vehicle_y, v_length, v_width);
 		}
+		
+
 	}
 	
 	private void drawRoad(Graphics g) {

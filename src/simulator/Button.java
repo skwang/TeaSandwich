@@ -16,7 +16,15 @@ public class Button {
 	
 	public boolean checkClicked(Input input) {
 		if (buttonShape.contains(input.getMouseX(), input.getAbsoluteMouseY()) 
-				&& input.isMousePressed(0)) { return true; }
+				&& input.isMousePressed(0)) 
+			return true; 
+		return false;
+	}
+	
+	public boolean checkClickandHold(Input input) {
+		if (buttonShape.contains(input.getMouseX(), input.getAbsoluteMouseY()) 
+				&& input.isMouseButtonDown(0)) 
+			return true;
 		return false;
 	}
 	

@@ -20,6 +20,7 @@ public class MainPage extends BasicGameState {
 	private int n;				// Helper to keep track of FPS/delta
 	private ViewWorld world; // World to be displayed, contains the logic for the game
 	private Button oneAB;
+	private Button slowFirst; 
 	
 	public MainPage(int id) {
 		this.stateId = id;
@@ -45,17 +46,26 @@ public class MainPage extends BasicGameState {
 		Input input = gc.getInput();
 		avgdelta = (avgdelta * n + delta)/(n+1);
 		n++;
-		this.world.update(delta/1000.); // dt = delta/1000. is secs
-		if (n > 16) {
-			
+		if (n > 120) {
 			n = 0;
+			int speed = (int) (Math.random() * 15) + 5;
+			Vehicle car = new Vehicle(0, speed, 0);
+			this.world.getViewRoad(0).getModelRoad().addVehicle(car, 'A');
 		}
+		this.world.update(delta/1000.); // dt = delta/1000. is secs
 		if (input.isKeyPressed(Input.KEY_ENTER)) 
 			sbg.enterState(1);
 		if (oneAB != null && oneAB.checkClicked(input)) {
 			int speed = (int) (Math.random() * 15) + 5;
 			Vehicle car = new Vehicle(0, speed, 0);
 			this.world.getViewRoad(0).getModelRoad().addVehicle(car, 'A');
+		}
+		// TODO: remove this prototype
+		if (slowFirst != null && slowFirst.checkClickandHold(input)) {
+			this.world.getViewRoad(0).getModelRoad().slowFirstCar('A', delta/1000.);
+		}
+		else {
+			this.world.getViewRoad(0).getModelRoad().stopSlowFirstCar('A', delta/1000.);
 		}
 		
 	}
@@ -74,18 +84,23 @@ public class MainPage extends BasicGameState {
 		if (oneAB != null) {
 			oneAB.draw(g);
 		}
+		if (slowFirst != null) {
+			slowFirst.draw(g);
+		}
 	}
 	
 	// prototype method to make the world
 	private void populateWorld() {
 		float world_length = this.world.convertPixelsToMeters((float) this.world.getWidth());
 		Vehicle car = new Vehicle(0, 40, 0);
-		Road center_road = new Road(20, world_length);
+		Road center_road = new Road(15.64, world_length);
 		center_road.addVehicle(car, 'A');
 		ViewRoad v_center_road = new ViewRoad(center_road, 0, this.world.getHeight()/2, 
 												this.world.convertMetersToPixels(1));
 		this.world.addViewRoad(v_center_road);
 		oneAB = new Button(v_center_road.getX(), v_center_road.getY() 
-							+ v_center_road.getWidth(), 12f, 15f, "+");
+							+ v_center_road.getWidth() + 20f, 90f, 15f, "+ Add car");
+		slowFirst = new Button(v_center_road.getX(), v_center_road.getY() 
+							+ v_center_road.getWidth() + 40f, 55f, 15f, "Slow 1");
 	}
 }

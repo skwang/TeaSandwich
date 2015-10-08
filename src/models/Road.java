@@ -73,32 +73,44 @@ public class Road {
 			Signal s = this.signalA;
 			Vehicle prev = null;
 			for (Vehicle v : vehiclesAB) {
-				double pos = v.updateFromSignal(dt, s);
-				if (pos > this.LENGTH) {
-					if (this.pointB == null)
-						toBeRemoved.add(v);
-				}
-				else if (prev != null && v.getFrontX() >= prev.getEndX()) {
-					v.setX(prev.getEndX());
-					v.setCrashed(true);
-					prev.setCrashed(true);
-					v.brake(dt);
-					prev.brake(dt);
-				}
-				prev = v;
+				prev = updateWithSignal(v, prev, dt, s, toBeRemoved);
 			}
 			for (Vehicle v : toBeRemoved) {
 				vehiclesAB.remove(v);
 			}
 		}
 		else if (startNode == 'B') {
-			// TODO: fix this method
 			Signal s = this.signalB;
 			Vehicle prev = null;
 			for (Vehicle v : vehiclesBA) {
-				double pos = v.updateFromSignal(dt, s);
+				prev = updateWithSignal(v, prev, dt, s, toBeRemoved);
+			}
+			for (Vehicle v : toBeRemoved) {
+				vehiclesBA.remove(v);
 			}
 		}
+	}
+	
+	private Vehicle updateWithSignal(Vehicle v, Vehicle prev, double dt, 
+								Signal s, ArrayList<Vehicle> toBeRemoved) 
+	{
+		double distTo = Double.MAX_VALUE;
+		if (prev != null) {
+			distTo = prev.getEndX() - v.getFrontX();
+		}
+		double pos = v.updateFromSignal(dt, s, distTo);
+		if (pos > this.LENGTH) {
+			if (this.pointB == null)
+				toBeRemoved.add(v);
+		}
+		else if (prev != null && v.getFrontX() >= prev.getEndX()) {
+			v.setX(prev.getEndX());
+			v.setCrashed(true);
+			prev.setCrashed(true);
+			v.brake(dt);
+			prev.brake(dt);
+		}
+		return v;
 	}
 	
 	// Update Roads with time delta dt and its 
@@ -129,5 +141,25 @@ public class Road {
 	public Node getNode(char node) {
 		if (node == 'A') return this.pointA;
 		else			 return this.pointB;
+	}
+	
+	// for testing only TODO: remove this prototype, slow first car
+	public void slowFirstCar(char node, double delta) {
+		if (node == 'A') {
+			if (!this.vehiclesAB.isEmpty()) {
+				this.vehiclesAB.get(0).setNoAccel(true);
+			}
+				
+		}
+	}
+	
+	// for testing only TODO: remove this prototype, unslow first car
+	public void stopSlowFirstCar(char node, double delta) {
+		if (node == 'A') {
+			if (!this.vehiclesAB.isEmpty()) {
+				this.vehiclesAB.get(0).setNoAccel(false);
+			}
+				
+		}
 	}
 }

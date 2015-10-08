@@ -12,12 +12,13 @@ public class Vehicle {
 	private final double LENGTH = 4.8514;     // 191"
 	private final double WIDTH = 1.8288;      // 72"
 	private final double TOP_ACCEL = 3.57632; // 0-60mph in 7.5s
+//	private final double TOP_ACCEL = 4.5;
 	private final double TOP_BRAKE = 4.33;
 	private final double TOP_SPEED = 54.5389; // 122mph
 	
 	// How much the accel and deaccelerate changes every second 
 	private final double ACCEL_RATE = TOP_ACCEL/3;
-	private final double BRAKE_RATE = TOP_BRAKE/3;
+	private final double BRAKE_RATE = TOP_BRAKE/4;
 	
 	// How fast the driver is willing to go above the speed limit
 	private final double SPEED_LIMIT_FACTOR = 4.4704; // 10 mph
@@ -27,10 +28,17 @@ public class Vehicle {
 	
 	// How much distance (in m) the driver places between himself and 
 	// the object in front when moving
-	private final double MOVING_MARGIN = 10;
+	// 1 car length for every 10 mph
+	private final double MOVING_MARGIN_PER_10 = 0.8 * this.LENGTH;
+	
+	// start stopping when you see cars in front stopping, or difference in velocities
+	// accelerate at slower rather than car in front from stopping
 	
 	// Same as above, but when braked
 	private final double STOPPED_MARGIN = 4;
+	
+	// whether the car should not speed up
+	private boolean noAccel = false; // TODO: remove this prototype
 	
 	public Vehicle(double x, double speed, double acceleration) {
 		this.x = x;
@@ -39,12 +47,25 @@ public class Vehicle {
 		this.crashed = false;
 	}
 	
-	// Update the Vehicle over an interval dt (in ms), in response to
-	// the signal s
-	public double updateFromSignal(double dt, Signal s) {
-		double secs = dt;
-		double new_speed = speed + secs * acceleration;
-		double avg_speed = (speed + new_speed)/2; // TODO: Try without the avg_speed
+	// Update the Vehicle over an interval dt (in secs), in response to
+	// the signal s and distTo (distance in meters to car in front)
+	public double updateFromSignal(double dt, Signal s, double distTo) {
+		if (s == null && !this.crashed) {
+			if (distTo < this.getSafeDist())  // react to car in front
+				this.brake(dt);
+			else if (speed < max_speed && distTo > this.getSafeDist() + 5 && !noAccel) // otherwise try up to speed limit
+				this.accel(dt);
+			else if (speed > max_speed)       // but don't go past speed limit
+				this.brake(dt);
+			else if (noAccel) { // TODO: remove this prototype 
+				this.brake(dt);
+			}
+			else 							  // cruise at max speed limit
+				this.acceleration = 0;
+		}
+		double new_speed = speed + dt * acceleration;
+		//double avg_speed = (speed + new_speed)/2; // TODO: Try without the avg_speed
+		double avg_speed = new_speed;
 		if (avg_speed <= 0) {
 			avg_speed = 0;
 			this.speed = 0;
@@ -56,16 +77,19 @@ public class Vehicle {
 			avg_speed = max_speed;
 		x = x + dt * avg_speed;
 		speed = avg_speed;
-		System.out.println(avg_speed);
 		return x;
+	}
+	
+	// return how close the car is willing to move to the car in front
+	private double getSafeDist() {
+		double TENMPH = 4.4704;
+		return Math.max(MOVING_MARGIN_PER_10 * this.speed / TENMPH, this.STOPPED_MARGIN);
 	}
 	
 	// Brake the car over an interval dt. Returns True if vehicle has 
 	// not yet reached TOP_BRAKE, False otherwise
 	public boolean brake(double dt) {
-		//System.out.println(dt);
 		// dt in secs!!!
-		double secs = dt;
 		double brake_amount = BRAKE_RATE; // m/s^2
 		double new_accel = acceleration - brake_amount;
 		if (new_accel > TOP_BRAKE) {
@@ -80,9 +104,8 @@ public class Vehicle {
 	// Accelerate the car over an interval dt. Returns True if vehicle has 
 	// not yet reached TOP_ACCEL, False otherwise
 	public boolean accel(double dt) {
-		double secs = dt/1000;
-		double accel_amount = ACCEL_RATE * secs;
-		double new_accel = acceleration + dt*accel_amount;
+		double accel_amount = ACCEL_RATE;
+		double new_accel = acceleration + accel_amount;
 		if (new_accel > TOP_ACCEL) {
 			this.acceleration = TOP_ACCEL;
 			return false;
@@ -144,5 +167,14 @@ public class Vehicle {
 	
 	public double getLength() {
 		return this.LENGTH;
+	}
+	
+	// gradually slow the car TODO: remove this prototype
+//	public void gradualSlow(double dt) {
+//		this.noAccel = true;
+//	}
+	
+	public void setNoAccel(boolean value) {
+		this.noAccel = value;
 	}
 }
