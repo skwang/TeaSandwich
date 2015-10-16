@@ -63,6 +63,9 @@ public class Vehicle {
 			else 							  // cruise at max speed limit
 				this.acceleration = 0;
 		}
+		else if (this.crashed) {
+			this.brake(dt);
+		}
 		double new_speed = speed + dt * acceleration;
 		//double avg_speed = (speed + new_speed)/2; // TODO: Try without the avg_speed
 		double avg_speed = new_speed;
@@ -97,7 +100,6 @@ public class Vehicle {
 			return false;
 		}
 		this.acceleration = new_accel;
-		//System.out.println(this.acceleration);
 		return true;
 	}
 	

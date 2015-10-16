@@ -3,51 +3,54 @@ package views;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 
-import models.Road;
+import models.Node;
 import models.Vehicle;
 
-public class ViewRoad {
-	
-	private Road modelRoad; // modelRoad associated with the ViewRoad 
+public class ViewNode {
+	private Node modelNode;
 	private float x; // the x pixel coordinate of the upper left pixel
 	private float y; // the y pixel coordinate of the upper left pixel
 	private float pixelsToMeters;
 	private float length; // in pixels
 	private float width;
 	
-	
-	public ViewRoad(Road modelRoad, int x, int y, float pixelsToMeters) {
-		this.modelRoad = modelRoad;
+	public ViewNode(Node modelNode, int x, int y, float pixelsToMeters) {
+		this.modelNode = modelNode;
 		this.x = x;
 		this.y = y;
 		this.pixelsToMeters = pixelsToMeters;
-		this.length = pixelsToMeters * (float) modelRoad.getLength();
-		this.width = pixelsToMeters * (float) modelRoad.getWidth();
+		this.length = pixelsToMeters * (float) modelNode.getLength();
+		this.width = pixelsToMeters * (float) modelNode.getWidth();
 	}
 	
-	// returns the pixel coordinate at the end
-	public float getEndX() {
-		return this.x + this.length;
-	}
-	
-	public float getFrontX() {
-		return this.x;
-	}
-
-	// draw the road, and associated vehicles on it
 	public void draw(Graphics g) {
-		drawRoad(g);
-		for (Vehicle v : this.modelRoad.getAB()) {
-			drawVehicle(g, v, 0);
-		}
-		for (Vehicle v : this.modelRoad.getBA()) {
-			drawVehicle(g, v, 1);
+		drawNode(g);
+		for (Vehicle v : this.modelNode.getAllVehicles().keySet()) {
+			drawVehicle(g, v, 0); // TODO: fix direction
 		}
 	}
 	
-	public Road getModelRoad()
-	{
-		return this.modelRoad;
+	public void update(double dt) {
+		this.modelNode.update(dt);
+	}
+	
+	private void drawNode(Graphics g) {
+		// draw road
+		g.setColor(Color.black);
+		g.fillRect(x, y, length, width);
+		
+		// draw the white bars
+		g.setColor(Color.white);
+		g.fillRect(x, y - 1, length, 2); 		 // top across
+		g.fillRect(x, y + width - 1, length, 2); // bot across
+		g.fillRect(x - 1, y, 2, width); 		 // left down
+		g.fillRect(x + length - 1, y, 2, width); // right down
+		
+		
+		// draw lane divider 
+		//g.setColor(Color.yellow);
+		//g.fillRect(x, y + width/2, length, 1); // left right
+		//g.fillRect(x + length/2, y, 1, width); // top down
 	}
 	
 	// direction 0 = L2R, direction 1 = R2L
@@ -78,37 +81,14 @@ public class ViewRoad {
 			float vehicle_y = this.y + 0.25f * width - 0.5f * pixelsToMeters * (float) v_width;
 			g.fillRect(vehicle_x, vehicle_y, v_length, v_width);
 		}
-		
-
 	}
 	
-	private void drawRoad(Graphics g) {
-		// draw road
-		g.setColor(Color.black);
-		g.fillRect(x, y, length, width);
-		// draw lane divider
-		g.setColor(Color.yellow);
-		g.fillRect(x, y + width/2, length, 1);
+	// returns the pixel coordinate at the end
+	public float getEndX() {
+		return this.x + this.length;
 	}
 	
-	public void update(double dt) {
-		this.modelRoad.update(dt);
-	}
-	
-	public float getX() {
+	public float getFrontX() {
 		return this.x;
 	}
-	
-	public float getY() {
-		return this.y;
-	}
-	
-	public float getWidth() {
-		return this.width;
-	}
-	
-	public float getLength() {
-		return this.length;
-	}
-	
 }

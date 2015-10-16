@@ -8,6 +8,7 @@ import org.newdawn.slick.Graphics;
 public class ViewWorld {
 	
 	private ArrayList<ViewRoad> viewroads;
+	private ArrayList<ViewNode> viewnodes;
 	private int height; // in pixels
 	private int width;  // in pixels
 	private Color background_color = new Color(224,224,224);
@@ -15,6 +16,7 @@ public class ViewWorld {
 	
 	public ViewWorld(int height, int width) {
 		this.viewroads = new ArrayList<ViewRoad>();
+		this.viewnodes = new ArrayList<ViewNode>();
 		this.height = height;
 		this.width = width;
 	}
@@ -22,13 +24,24 @@ public class ViewWorld {
 	public void draw(Graphics g) {
 		g.setColor(background_color);
 		g.fillRect(0, 0, width, height);
+		for (ViewNode vn : this.viewnodes) {
+			vn.draw(g);
+		}
 		for (ViewRoad road : viewroads) road.draw(g);
 	}
 	
 	public void update(double dt) {
+		for (ViewNode vn : this.viewnodes) {
+			vn.update(dt);
+		}
 		for (ViewRoad vr : this.viewroads) {
 			vr.update(dt);
 		}
+		
+	}
+	
+	public void addViewNode(ViewNode vn) {
+		this.viewnodes.add(vn);
 	}
 	
 	public void addViewRoad(ViewRoad vr) {

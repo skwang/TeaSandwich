@@ -68,7 +68,7 @@ public class Road {
 	
 	// Update the vehicles 
 	private void updateRoad(char startNode, double dt) {
-		ArrayList<Vehicle> toBeRemoved = new ArrayList<Vehicle>();
+		HashSet<Vehicle> toBeRemoved = new HashSet<Vehicle>();
 		if (startNode == 'A') {
 			Signal s = this.signalA;
 			Vehicle prev = null;
@@ -92,7 +92,7 @@ public class Road {
 	}
 	
 	private Vehicle updateWithSignal(Vehicle v, Vehicle prev, double dt, 
-								Signal s, ArrayList<Vehicle> toBeRemoved) 
+								Signal s, HashSet<Vehicle> toBeRemoved) 
 	{
 		double distTo = Double.MAX_VALUE;
 		if (prev != null) {
@@ -100,15 +100,17 @@ public class Road {
 		}
 		double pos = v.updateFromSignal(dt, s, distTo);
 		if (pos > this.LENGTH) {
-			if (this.pointB == null)
-				toBeRemoved.add(v);
+			if (this.pointB != null) {
+				int result = this.pointB.enterNode(v, this);
+				System.out.println("Enter node result: " + result);
+			}
+			toBeRemoved.add(v);	
+			return null;
 		}
 		else if (prev != null && v.getFrontX() >= prev.getEndX()) {
 			v.setX(prev.getEndX());
 			v.setCrashed(true);
 			prev.setCrashed(true);
-			v.brake(dt);
-			prev.brake(dt);
 		}
 		return v;
 	}
