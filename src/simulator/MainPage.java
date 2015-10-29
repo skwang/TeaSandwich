@@ -22,6 +22,7 @@ public class MainPage extends BasicGameState {
 	private int n;				// Helper to keep track of FPS/delta
 	private ViewWorld world; // World to be displayed, contains the logic for the game
 	private Button oneAB;
+	private Button oneBA;
 	private Button slowFirst; 
 	
 	public MainPage(int id) {
@@ -57,10 +58,17 @@ public class MainPage extends BasicGameState {
 		this.world.update(delta/1000.); // dt = delta/1000. is secs
 //		if (input.isKeyPressed(Input.KEY_ENTER)) 
 //			sbg.enterState(1);
-		if (oneAB != null && oneAB.checkClicked(input)) {
+		if (oneAB != null && oneAB.checkClicked(input)) 
+		{
 			int speed = (int) (Math.random() * 15) + 5;
 			Vehicle car = new Vehicle(0, speed, 0);
 			this.world.getViewRoad(0).getModelRoad().addVehicle(car, 'A');
+		}
+		if (oneBA != null && oneBA.checkClicked(input)) 
+		{
+			int speed = (int) (Math.random() * 15) + 5;
+			Vehicle car = new Vehicle(0, speed, 0);
+			this.world.getViewRoad(1).getModelRoad().addVehicle(car, 'B');
 		}
 		// TODO: remove this prototype
 		if (slowFirst != null && slowFirst.checkClickandHold(input)) {
@@ -86,6 +94,9 @@ public class MainPage extends BasicGameState {
 		if (oneAB != null) {
 			oneAB.draw(g);
 		}
+		if (oneBA != null) {
+			oneBA.draw(g);
+		}
 		if (slowFirst != null) {
 			slowFirst.draw(g);
 		}
@@ -95,9 +106,9 @@ public class MainPage extends BasicGameState {
 	private void populateWorld() {
 		float world_length = this.world.convertPixelsToMeters((float) this.world.getWidth());
 		Vehicle car = new Vehicle(0, 40, 0);
-		Road center_road = new Road(15.64, world_length/2 - 22);
+		Road center_road = new Road(15.64, world_length/2 - 5.5);
 		
-		Road next_road = new Road(15.64, world_length/2 - 22);
+		Road next_road = new Road(15.64*2, world_length/2 - 5.5);
 		Node intersection = new Node(null, null, center_road, next_road);
 		center_road.addVehicle(car, 'A');
 		center_road.setpointB(intersection);
@@ -106,14 +117,16 @@ public class MainPage extends BasicGameState {
 		
 		int level = this.world.getHeight()/2;
 		ViewRoad v_center_road = new ViewRoad(center_road, 0, level, 
-												this.world.convertMetersToPixels(1));
+												this.world.convertMetersToPixels(1), 
+												ViewRoad.Orientation.HORIZONTAL);
 		
 		
 		ViewNode v_intersection = new ViewNode(intersection, (int) v_center_road.getEndX(), 
 								level, this.world.convertMetersToPixels(1));
 		
-		ViewRoad v_next_road = new ViewRoad(next_road, (int) v_intersection.getEndX(), level,
-											this.world.convertMetersToPixels(1));
+		ViewRoad v_next_road = new ViewRoad(next_road, (int) v_intersection.getRightX(), level,
+											this.world.convertMetersToPixels(1), 
+											ViewRoad.Orientation.HORIZONTAL);
 		
 		this.world.addViewRoad(v_center_road);
 		this.world.addViewRoad(v_next_road);
@@ -121,6 +134,10 @@ public class MainPage extends BasicGameState {
 		
 		oneAB = new Button(v_center_road.getX(), v_center_road.getY() 
 							+ v_center_road.getWidth() + 20f, 90f, 15f, "+ Add car");
+		
+		oneBA = new Button(v_next_road.getX() + v_next_road.getLength() - 90f, 
+							v_next_road.getY() - v_next_road.getWidth() - 20f, 90f, 15f, "+ Add car");
+		
 		slowFirst = new Button(v_center_road.getX(), v_center_road.getY() 
 							+ v_center_road.getWidth() + 40f, 55f, 15f, "Slow 1");
 	}

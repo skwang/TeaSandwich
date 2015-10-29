@@ -51,12 +51,18 @@ public class Node {
 	// enter a Vehicle v into the intersection. src denotes the 
 	// source Road, which is used to determine orientation
 	public int enterNode(Vehicle v, Road src) {
-		
 		if (src.equals(left)) {
 			double initX = 0;
 			double initY = WIDTH*3/4; 
 			v.setX(0);
 			allVehicles.put(v, new NodeVector(initX, initY, L2R));
+			return 1;
+		}
+		else if (src.equals(right)) {
+			double initX = LENGTH;
+			double initY = WIDTH * 1/4;
+			v.setX(0);
+			allVehicles.put(v, new NodeVector(initX, initY, R2L));
 			return 1;
 		}
 		return -1;
@@ -65,7 +71,6 @@ public class Node {
 	public void update(double dt) {
 		HashSet<Vehicle> toBeRemoved = new HashSet<Vehicle>();
 		for (Vehicle v : allVehicles.keySet()) {
-			System.out.println(v.getFrontX());
 			v.updateFromSignal(dt, null, 1000); // TODO: figure out this update thing
 			int direction = allVehicles.get(v).D;
 			if (direction == L2R) {
@@ -76,6 +81,18 @@ public class Node {
 					toBeRemoved.add(v);
 					if (this.right != null) {
 						right.addVehicle(v, 'A');
+						v.setX(0);
+					}
+				}
+			}
+			else if (direction == R2L) {
+				allVehicles.get(v).X = LENGTH - v.getFrontX();
+				// leaving the intersection
+				if (v.getFrontX() > this.LENGTH) {
+					System.out.println("remove me");
+					toBeRemoved.add(v);
+					if (this.left != null) {
+						left.addVehicle(v, 'B');
 						v.setX(0);
 					}
 				}

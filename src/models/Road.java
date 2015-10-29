@@ -4,6 +4,10 @@ import java.util.*;
 
 public class Road {
 	
+	public enum Direction {
+		AtoB, BtoA
+	}
+	
 	// in m or m/s 
 	private final double SPEED_LIMIT;
 	private final double LENGTH;
@@ -60,7 +64,7 @@ public class Road {
 	public void addVehicle(Vehicle v, char startNode) {
 		if (startNode == 'A') 
 			vehiclesAB.add(v);	
-		else
+		else if (startNode == 'B') 
 			vehiclesBA.add(v);
 		v.setX(0);
 		v.setMaxSpeed(SPEED_LIMIT);
@@ -73,7 +77,7 @@ public class Road {
 			Signal s = this.signalA;
 			Vehicle prev = null;
 			for (Vehicle v : vehiclesAB) {
-				prev = updateWithSignal(v, prev, dt, s, toBeRemoved);
+				prev = updateWithSignal(v, prev, dt, s, toBeRemoved, Direction.AtoB);
 			}
 			for (Vehicle v : toBeRemoved) {
 				vehiclesAB.remove(v);
@@ -83,7 +87,7 @@ public class Road {
 			Signal s = this.signalB;
 			Vehicle prev = null;
 			for (Vehicle v : vehiclesBA) {
-				prev = updateWithSignal(v, prev, dt, s, toBeRemoved);
+				prev = updateWithSignal(v, prev, dt, s, toBeRemoved, Direction.BtoA);
 			}
 			for (Vehicle v : toBeRemoved) {
 				vehiclesBA.remove(v);
@@ -92,7 +96,7 @@ public class Road {
 	}
 	
 	private Vehicle updateWithSignal(Vehicle v, Vehicle prev, double dt, 
-								Signal s, HashSet<Vehicle> toBeRemoved) 
+								Signal s, HashSet<Vehicle> toBeRemoved, Direction d) 
 	{
 		double distTo = Double.MAX_VALUE;
 		if (prev != null) {
@@ -100,8 +104,12 @@ public class Road {
 		}
 		double pos = v.updateFromSignal(dt, s, distTo);
 		if (pos > this.LENGTH) {
-			if (this.pointB != null) {
+			if (d == Direction.AtoB && this.pointB != null) {
 				int result = this.pointB.enterNode(v, this);
+				System.out.println("Enter node result: " + result);
+			}
+			else if (d == Direction.BtoA && this.pointA != null) {
+				int result = this.pointA.enterNode(v, this);
 				System.out.println("Enter node result: " + result);
 			}
 			toBeRemoved.add(v);	

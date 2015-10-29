@@ -11,8 +11,8 @@ public class ViewNode {
 	private float x; // the x pixel coordinate of the upper left pixel
 	private float y; // the y pixel coordinate of the upper left pixel
 	private float pixelsToMeters;
-	private float length; // in pixels
-	private float width;
+	private float length; // in pixels length is X
+	private float width;  // width is Y
 	
 	public ViewNode(Node modelNode, int x, int y, float pixelsToMeters) {
 		this.modelNode = modelNode;
@@ -23,10 +23,10 @@ public class ViewNode {
 		this.width = pixelsToMeters * (float) modelNode.getWidth();
 	}
 	
-	public void draw(Graphics g) {
-		drawNode(g);
+	public void drawVehicles(Graphics g) {
 		for (Vehicle v : this.modelNode.getAllVehicles().keySet()) {
-			drawVehicle(g, v, 0); // TODO: fix direction
+			int direction = this.modelNode.getAllVehicles().get(v).D;
+			drawVehicle(g, v, direction); // TODO: fix direction
 		}
 	}
 	
@@ -34,7 +34,7 @@ public class ViewNode {
 		this.modelNode.update(dt);
 	}
 	
-	private void drawNode(Graphics g) {
+	public void drawNode(Graphics g) {
 		// draw road
 		g.setColor(Color.black);
 		g.fillRect(x, y, length, width);
@@ -46,11 +46,6 @@ public class ViewNode {
 		g.fillRect(x - 1, y, 2, width); 		 // left down
 		g.fillRect(x + length - 1, y, 2, width); // right down
 		
-		
-		// draw lane divider 
-		//g.setColor(Color.yellow);
-		//g.fillRect(x, y + width/2, length, 1); // left right
-		//g.fillRect(x + length/2, y, 1, width); // top down
 	}
 	
 	// direction 0 = L2R, direction 1 = R2L
@@ -77,18 +72,26 @@ public class ViewNode {
 			g.drawString(String.format("%.1f",v.getCurrSpeed() * mpstomph), vehicle_x - 10, vehicle_y + 10);
 		}
 		else { // direction  = 1
-			float vehicle_x = this.x + pixelsToMeters * (float) v.getFrontX();
-			float vehicle_y = this.y + 0.25f * width - 0.5f * pixelsToMeters * (float) v_width;
+			float vehicle_x = this.x + this.length - pixelsToMeters * (float) v.getFrontX();
+			float vehicle_y = this.y + 0.35f * width - 0.5f * pixelsToMeters * (float) v_width;
 			g.fillRect(vehicle_x, vehicle_y, v_length, v_width);
 		}
 	}
 	
 	// returns the pixel coordinate at the end
-	public float getEndX() {
+	public float getRightX() {
 		return this.x + this.length;
 	}
 	
-	public float getFrontX() {
+	public float getLeftX() {
 		return this.x;
+	}
+	
+	public float getTopY() {
+		return this.y;
+	}
+	
+	public float getBotY() {
+		return this.y + this.width;
 	}
 }

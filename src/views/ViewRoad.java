@@ -8,21 +8,27 @@ import models.Vehicle;
 
 public class ViewRoad {
 	
+	public enum Orientation {
+		VERTICAL, HORIZONTAL
+	}
+	
 	private Road modelRoad; // modelRoad associated with the ViewRoad 
 	private float x; // the x pixel coordinate of the upper left pixel
 	private float y; // the y pixel coordinate of the upper left pixel
 	private float pixelsToMeters;
 	private float length; // in pixels
 	private float width;
+	private Orientation orientation;
 	
 	
-	public ViewRoad(Road modelRoad, int x, int y, float pixelsToMeters) {
+	public ViewRoad(Road modelRoad, int x, int y, float pixelsToMeters, Orientation orientation) {
 		this.modelRoad = modelRoad;
 		this.x = x;
 		this.y = y;
 		this.pixelsToMeters = pixelsToMeters;
 		this.length = pixelsToMeters * (float) modelRoad.getLength();
 		this.width = pixelsToMeters * (float) modelRoad.getWidth();
+		this.orientation = orientation;
 	}
 	
 	// returns the pixel coordinate at the end
@@ -34,9 +40,8 @@ public class ViewRoad {
 		return this.x;
 	}
 
-	// draw the road, and associated vehicles on it
-	public void draw(Graphics g) {
-		drawRoad(g);
+	// draw the associated vehicles on it
+	public void drawVehicles(Graphics g) {
 		for (Vehicle v : this.modelRoad.getAB()) {
 			drawVehicle(g, v, 0);
 		}
@@ -64,25 +69,31 @@ public class ViewRoad {
 		else if (v.getCurrAccel() < 0) g.setColor(Color.yellow);
 		else if (v.getCurrAccel() > 0) g.setColor(Color.green);
 		
-		if (direction == 0) {
-			float vehicle_x = this.x + pixelsToMeters* (float) v.getEndX();
-			float vehicle_y = this.y + 0.85f * width - 0.5f * pixelsToMeters * (float) v_width;
-			g.fillRect(vehicle_x, vehicle_y, v_length, v_width);
-			// print speed
-			double mpstomph = 2.23694;
-			g.setColor(Color.black);
-			g.drawString(String.format("%.1f",v.getCurrSpeed() * mpstomph), vehicle_x - 10, vehicle_y + 10);
-		}
-		else { // direction  = 1
-			float vehicle_x = this.x + pixelsToMeters * (float) v.getFrontX();
-			float vehicle_y = this.y + 0.25f * width - 0.5f * pixelsToMeters * (float) v_width;
-			g.fillRect(vehicle_x, vehicle_y, v_length, v_width);
-		}
+		double mpstomph = 2.23694;
 		
-
+		if (this.orientation == Orientation.HORIZONTAL) 
+		{
+			if (direction == 0) 
+			{
+				float vehicle_x = this.x + pixelsToMeters* (float) v.getEndX();
+				float vehicle_y = this.y + 0.85f * width - 0.5f * pixelsToMeters * (float) v_width;
+				g.fillRect(vehicle_x, vehicle_y, v_length, v_width);
+				// print speed
+				g.setColor(Color.black);
+				g.drawString(String.format("%.1f",v.getCurrSpeed() * mpstomph), vehicle_x - 10, vehicle_y + 10);
+			}
+			else { // direction  = 1
+				float vehicle_x = this.x + this.length - pixelsToMeters * (float) v.getFrontX();
+				float vehicle_y = this.y + 0.35f * width - 0.5f * pixelsToMeters * (float) v_width;
+				g.fillRect(vehicle_x, vehicle_y, v_length, v_width);
+				// print speed
+				g.setColor(Color.black);
+				g.drawString(String.format("%.1f",v.getCurrSpeed() * mpstomph), vehicle_x - 10, vehicle_y - 20);
+			}
+		}
 	}
 	
-	private void drawRoad(Graphics g) {
+	public void drawRoad(Graphics g) {
 		// draw road
 		g.setColor(Color.black);
 		g.fillRect(x, y, length, width);

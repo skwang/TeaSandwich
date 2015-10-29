@@ -24,10 +24,10 @@ public class ViewWorld {
 	public void draw(Graphics g) {
 		g.setColor(background_color);
 		g.fillRect(0, 0, width, height);
-		for (ViewNode vn : this.viewnodes) {
-			vn.draw(g);
-		}
-		for (ViewRoad road : viewroads) road.draw(g);
+		for (ViewNode vn : this.viewnodes) vn.drawNode(g);
+		for (ViewRoad road : viewroads)    road.drawRoad(g);
+		for (ViewNode vn : this.viewnodes) vn.drawVehicles(g);
+		for (ViewRoad road : viewroads) road.drawVehicles(g);
 	}
 	
 	public void update(double dt) {

@@ -76,8 +76,9 @@ public class Vehicle {
 		}
 		else if (avg_speed > TOP_SPEED)
 			avg_speed = TOP_SPEED;
-		else if (avg_speed > max_speed)
+		else if (avg_speed > max_speed) { // maxspeed needs to be fixed
 			avg_speed = max_speed;
+		}
 		x = x + dt * avg_speed;
 		speed = avg_speed;
 		return x;
