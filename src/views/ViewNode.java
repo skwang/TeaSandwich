@@ -71,10 +71,20 @@ public class ViewNode {
 			g.setColor(Color.black);
 			g.drawString(String.format("%.1f",v.getCurrSpeed() * mpstomph), vehicle_x - 10, vehicle_y + 10);
 		}
-		else { // direction  = 1
+		else if (direction == 1) { 
 			float vehicle_x = this.x + this.length - pixelsToMeters * (float) v.getFrontX();
 			float vehicle_y = this.y + 0.35f * width - 0.5f * pixelsToMeters * (float) v_width;
 			g.fillRect(vehicle_x, vehicle_y, v_length, v_width);
+		}
+		else if (direction == 2) {
+			float vehicle_x = this.x + 0.35f * width - 0.5f * pixelsToMeters * (float) v_width;
+			float vehicle_y = this.y + pixelsToMeters * (float) v.getEndX();
+			g.fillRect(vehicle_x, vehicle_y, v_width, v_length);
+		}
+		else if (direction == 3) {
+			float vehicle_x = this.x + 0.85f * width - 0.5f * pixelsToMeters * (float) v_width;
+			float vehicle_y = this.y + this.length - pixelsToMeters* (float) v.getFrontX();
+			g.fillRect(vehicle_x, vehicle_y, v_width, v_length);
 		}
 	}
 	

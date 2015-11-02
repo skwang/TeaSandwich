@@ -27,7 +27,7 @@ public class ViewWorld {
 		for (ViewNode vn : this.viewnodes) vn.drawNode(g);
 		for (ViewRoad road : viewroads)    road.drawRoad(g);
 		for (ViewNode vn : this.viewnodes) vn.drawVehicles(g);
-		for (ViewRoad road : viewroads) road.drawVehicles(g);
+		for (ViewRoad road : viewroads)    road.drawVehicles(g);
 	}
 	
 	public void update(double dt) {

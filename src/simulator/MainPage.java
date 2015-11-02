@@ -23,6 +23,8 @@ public class MainPage extends BasicGameState {
 	private ViewWorld world; // World to be displayed, contains the logic for the game
 	private Button oneAB;
 	private Button oneBA;
+	private Button topAB;
+	private Button botBA;
 	private Button slowFirst; 
 	
 	public MainPage(int id) {
@@ -70,6 +72,18 @@ public class MainPage extends BasicGameState {
 			Vehicle car = new Vehicle(0, speed, 0);
 			this.world.getViewRoad(1).getModelRoad().addVehicle(car, 'B');
 		}
+		if (topAB != null && topAB.checkClicked(input)) 
+		{
+			int speed = (int) (Math.random() * 15) + 5;
+			Vehicle car = new Vehicle(0, speed, 0);
+			this.world.getViewRoad(2).getModelRoad().addVehicle(car, 'A');
+		}
+		if (botBA != null && botBA.checkClicked(input)) 
+		{
+			int speed = (int) (Math.random() * 15) + 5;
+			Vehicle car = new Vehicle(0, speed, 0);
+			this.world.getViewRoad(3).getModelRoad().addVehicle(car, 'B');
+		}
 		// TODO: remove this prototype
 		if (slowFirst != null && slowFirst.checkClickandHold(input)) {
 			this.world.getViewRoad(0).getModelRoad().slowFirstCar('A', delta/1000.);
@@ -97,6 +111,12 @@ public class MainPage extends BasicGameState {
 		if (oneBA != null) {
 			oneBA.draw(g);
 		}
+		if (topAB != null) {
+			topAB.draw(g);
+		}
+		if (botBA != null) {
+			botBA.draw(g);
+		}
 		if (slowFirst != null) {
 			slowFirst.draw(g);
 		}
@@ -105,38 +125,56 @@ public class MainPage extends BasicGameState {
 	// prototype method to make the world
 	private void populateWorld() {
 		float world_length = this.world.convertPixelsToMeters((float) this.world.getWidth());
+		float world_height = this.world.convertPixelsToMeters((float) this.world.getHeight());
 		Vehicle car = new Vehicle(0, 40, 0);
+		Vehicle car2 = new Vehicle(0, 40, 0);
+		
 		Road center_road = new Road(15.64, world_length/2 - 5.5);
+		Road next_road = new Road(15.64*1.25, world_length/2 - 5.5);
+		Road top_road = new Road(15.64, world_height/2);
+		Road bot_road = new Road(15.64, world_height/2 - 11);
+		Node intersection = new Node(top_road, bot_road, center_road, next_road);
 		
-		Road next_road = new Road(15.64*2, world_length/2 - 5.5);
-		Node intersection = new Node(null, null, center_road, next_road);
-		center_road.addVehicle(car, 'A');
+		
+		top_road.addVehicle(car, 'A');
+		bot_road.addVehicle(car2, 'B');
 		center_road.setpointB(intersection);
-		
 		next_road.setpointA(intersection);
+		top_road.setpointB(intersection);
+		bot_road.setpointA(intersection);
 		
 		int level = this.world.getHeight()/2;
 		ViewRoad v_center_road = new ViewRoad(center_road, 0, level, 
 												this.world.convertMetersToPixels(1), 
 												ViewRoad.Orientation.HORIZONTAL);
-		
-		
-		ViewNode v_intersection = new ViewNode(intersection, (int) v_center_road.getEndX(), 
-								level, this.world.convertMetersToPixels(1));
-		
+		ViewNode v_intersection = new ViewNode(intersection, (int) v_center_road.getEndX(), level, 
+												this.world.convertMetersToPixels(1));
 		ViewRoad v_next_road = new ViewRoad(next_road, (int) v_intersection.getRightX(), level,
 											this.world.convertMetersToPixels(1), 
 											ViewRoad.Orientation.HORIZONTAL);
+		ViewRoad v_top_road = new ViewRoad(top_road,(int) v_intersection.getLeftX(), 0, 
+											this.world.convertMetersToPixels(1),
+											ViewRoad.Orientation.VERTICAL);
+		ViewRoad v_bot_road = new ViewRoad(bot_road,(int) v_intersection.getLeftX(), (int) v_intersection.getBotY(), 
+											this.world.convertMetersToPixels(1),
+											ViewRoad.Orientation.VERTICAL);
 		
 		this.world.addViewRoad(v_center_road);
 		this.world.addViewRoad(v_next_road);
 		this.world.addViewNode(v_intersection);
+		this.world.addViewRoad(v_top_road);
+		this.world.addViewRoad(v_bot_road);
 		
-		oneAB = new Button(v_center_road.getX(), v_center_road.getY() 
+		oneAB = new Button(v_center_road.getX(), v_center_road.getY()
 							+ v_center_road.getWidth() + 20f, 90f, 15f, "+ Add car");
 		
 		oneBA = new Button(v_next_road.getX() + v_next_road.getLength() - 90f, 
 							v_next_road.getY() - v_next_road.getWidth() - 20f, 90f, 15f, "+ Add car");
+		
+		topAB = new Button(v_top_road.getX() - 90, 0, 90f, 15f, "+ Add car");
+
+		botBA = new Button(v_bot_road.getX() + v_bot_road.getWidth(), 
+							this.world.getHeight() - 15f, 90f, 15f, "+ Add car");
 		
 		slowFirst = new Button(v_center_road.getX(), v_center_road.getY() 
 							+ v_center_road.getWidth() + 40f, 55f, 15f, "Slow 1");

@@ -60,9 +60,23 @@ public class Node {
 		}
 		else if (src.equals(right)) {
 			double initX = LENGTH;
-			double initY = WIDTH * 1/4;
+			double initY = WIDTH * 1/4.;
 			v.setX(0);
 			allVehicles.put(v, new NodeVector(initX, initY, R2L));
+			return 1;
+		}
+		else if (src.equals(top)) {
+			double initX = LENGTH * 1/4.;
+			double initY = 0;
+			v.setX(0);
+			allVehicles.put(v, new NodeVector(initX, initY, T2B));
+			return 1;
+		}
+		else if (src.equals(bot)) {
+			double initX = LENGTH * 3/4.;
+			double initY = WIDTH;
+			v.setX(0);
+			allVehicles.put(v, new NodeVector(initX, initY, B2T));
 			return 1;
 		}
 		return -1;
@@ -75,7 +89,6 @@ public class Node {
 			int direction = allVehicles.get(v).D;
 			if (direction == L2R) {
 				allVehicles.get(v).X = v.getFrontX();
-				
 				// leaving the intersection
 				if (allVehicles.get(v).X > this.LENGTH) {
 					toBeRemoved.add(v);
@@ -89,7 +102,6 @@ public class Node {
 				allVehicles.get(v).X = LENGTH - v.getFrontX();
 				// leaving the intersection
 				if (v.getFrontX() > this.LENGTH) {
-					System.out.println("remove me");
 					toBeRemoved.add(v);
 					if (this.left != null) {
 						left.addVehicle(v, 'B');
@@ -97,6 +109,27 @@ public class Node {
 					}
 				}
 			}
+			else if (direction == T2B) {
+				allVehicles.get(v).Y = v.getFrontX();
+				if (v.getFrontX() > this.WIDTH) {
+					toBeRemoved.add(v);
+					if (this.bot != null) {
+						bot.addVehicle(v, 'A');
+						v.setX(0);
+					}
+				}
+			}
+			else if (direction == B2T) {
+				allVehicles.get(v).Y = WIDTH - v.getFrontX();
+				if (v.getFrontX() > this.WIDTH) {
+					toBeRemoved.add(v);
+					if (this.top != null) {
+						top.addVehicle(v, 'B');
+						v.setX(0);
+					}
+				}
+			}
+			
 		}
 		for (Vehicle v : toBeRemoved) {
 			allVehicles.remove(v);
